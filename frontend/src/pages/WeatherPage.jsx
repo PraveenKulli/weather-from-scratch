@@ -9,31 +9,45 @@ export default function WeatherPage(){
 
   async function search(){
     setError(''); setData(null);
-    if (!city || country.length !== 2) { setError('Enter city and 2-letter country code'); return; }
+    if (!city || country.length !== 2) {
+      setError('Enter a city and 2-letter country code, e.g., AU, IN, US');
+      return;
+    }
     try {
-      const r = await getWeather(city, country);
+      const r = await getWeather(city.trim(), country.trim().toUpperCase());
       setData(r);
     } catch (e) { setError(e.message); }
   }
 
   return (
-    <div>
-      <h2>Weather Search</h2>
-      <div style={{display:'flex', gap:8}}>
-        <input value={city} onChange={e=>setCity(e.target.value)} placeholder="City" />
-        <input value={country} onChange={e=>setCountry(e.target.value.toUpperCase())} placeholder="Country (AU)" maxLength={2} />
-        <button onClick={search}>Search</button>
+    <section className="card">
+      <h1>Weather Search</h1>
+      <div className="sub">Look up the current description for any city.</div>
+
+      <div className="row wrap">
+        <input className="input w-2" value={city}
+          onChange={e=>setCity(e.target.value)} placeholder="City (e.g., Melbourne)" />
+        <input className="input w-1" value={country}
+          onChange={e=>setCountry(e.target.value.toUpperCase())}
+          placeholder="Country (AU)" maxLength={2} />
+        <button className="btn" onClick={search}>Search</button>
       </div>
+
       {error && <div className="error">{error}</div>}
+
       {data && (
-        <div className="card" style={{marginTop:12}}>
-          <div><strong>{data.city}, {data.country}</strong></div>
-          <div>Description: {data.description}</div>
-          {typeof data.tempC === 'number' && <div>Temp: {Math.round(data.tempC)} ℃</div>}
-          {typeof data.humidity === 'number' && <div>Humidity: {data.humidity}%</div>}
-          {typeof data.windKph === 'number' && <div>Wind: {data.windKph} kph</div>}
+        <div className="result-grid">
+          <div className="card">
+            <div className="result-title">{data.city}, {data.country}</div>
+            <div className="result-desc">“{data.description}”</div>
+          </div>
+          <div className="card stats">
+            <div><span>Temp</span><b>{typeof data.tempC === 'number' ? Math.round(data.tempC) + ' ℃' : '—'}</b></div>
+            <div><span>Humidity</span><b>{typeof data.humidity === 'number' ? data.humidity + '%' : '—'}</b></div>
+            <div><span>Wind</span><b>{typeof data.windKph === 'number' ? data.windKph + ' kph' : '—'}</b></div>
+          </div>
         </div>
       )}
-    </div>
+    </section>
   );
 }

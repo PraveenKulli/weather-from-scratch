@@ -16,22 +16,34 @@ function Guard({ children, role }) {
 export default function App(){
   const { user } = useAuth();
   const navigate = useNavigate();
+
   return (
     <div className="container">
-      <div className="nav">
-        <Link to="/">Search</Link>
-        <Link to="/admin">Admin</Link>
-        {user ? (
-          <button onClick={() => logout().then(()=>navigate('/login'))}>Logout</button>
-        ) : (
-          <Link to="/login">Login</Link>
-        )}
-      </div>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/admin" element={<Guard role="admin"><AdminPage /></Guard>} />
-        <Route path="/" element={<Guard><WeatherPage /></Guard>} />
-      </Routes>
+      {/* Header (brand + single global nav) */}
+      <header className="header">
+        <div className="brand" onClick={()=>navigate('/')}>
+          <span className="logo">🌤️</span>
+          <span>Weather Report</span>
+        </div>
+        <nav className="nav">
+          <Link to="/">Search</Link>
+          <Link to="/admin">Admin</Link>
+          {user ? (
+            <button onClick={() => logout().then(()=>navigate('/login'))}>Logout</button>
+          ) : (
+            <Link to="/login">Login</Link>
+          )}
+        </nav>
+      </header>
+
+      {/* Page body */}
+      <main className="body">
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/admin" element={<Guard role="admin"><AdminPage /></Guard>} />
+          <Route path="/" element={<Guard><WeatherPage /></Guard>} />
+        </Routes>
+      </main>
     </div>
   );
 }

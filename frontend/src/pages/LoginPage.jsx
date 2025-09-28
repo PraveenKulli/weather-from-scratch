@@ -11,21 +11,46 @@ export default function LoginPage(){
   async function onSubmit(e){
     e.preventDefault();
     setError('');
-    try {
-      const r = await login(username, password);
+    try{
+      const r = await login(username.trim(), password);
       navigate(r.role === 'admin' ? '/admin' : '/');
-    } catch (e) { setError(e.message); }
+    }catch(err){
+      setError(err.message || 'Login failed');
+    }
   }
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={onSubmit}>
-        <div><input value={username} onChange={e=>setUsername(e.target.value)} placeholder="Username" /></div>
-        <div><input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" /></div>
-        <button>Sign In</button>
-      </form>
-      {error && <div className="error">{error}</div>}
-    </div>
+    <section className="grid-2">
+      <div className="card">
+        <h1>Welcome back 👋</h1>
+        <div className="sub">Sign in to continue to the Weather Dashboard.</div>
+        <form className="form" onSubmit={onSubmit}>
+          <input
+            className="input"
+            value={username}
+            onChange={e=>setUsername(e.target.value)}
+            placeholder="Username (e.g. alice)" autoComplete="username"
+          />
+          <input
+            type="password"
+            className="input"
+            value={password}
+            onChange={e=>setPassword(e.target.value)}
+            placeholder="Password" autoComplete="current-password"
+          />
+          <button className="btn" type="submit">Sign In</button>
+          {error && <div className="error">{error}</div>}
+        </form>
+        <div className="sub">Tip: <b>alice / User@123</b> or <b>admin / Admin@123</b></div>
+      </div>
+
+      <aside className="card accent">
+        <h2 style={{marginTop:0}}>Today’s Forecast</h2>
+        <div className="sub" style={{marginBottom:16}}>
+          Secure access with JWT • Smart key rotation • Admin insights
+        </div>
+        <div className="empty-panel">🌤️ <b>Weather Report Website</b></div>
+      </aside>
+    </section>
   );
 }
