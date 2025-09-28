@@ -48,10 +48,18 @@ async function getWeatherWithPool(pool, req, res) {
 
 function getAllSearches(req, res) {
   const rows = db.prepare(`
-    SELECT s.id, u.username, s.country, s.city, s.created_at AS time
-    FROM searches s JOIN users u ON u.id = s.user_id
+    SELECT
+      s.id,
+      u.username,
+      s.country,
+      s.city,
+      -- SQLite CURRENT_TIMESTAMP is UTC; format it as ISO-8601 UTC
+      strftime('%Y-%m-%dT%H:%M:%SZ', s.created_at) AS time
+    FROM searches s
+    JOIN users u ON u.id = s.user_id
     ORDER BY s.created_at DESC
   `).all();
+
   res.json(rows);
 }
 
