@@ -1,15 +1,22 @@
 import { useEffect, useState } from 'react';
 import { getSearches } from '../api';
 
-function formatTime(ts){
-  // Format nicely in the user's local time
+// Format UTC timestamp into the searcher's own timezone
+function formatTime(ts, tz){
   try{
-    const d = new Date(ts); // SQLite CURRENT_TIMESTAMP is ISO-like, safe to parse
-    return d.toLocaleString(undefined, {
-      year:'numeric', month:'short', day:'2-digit',
-      hour:'2-digit', minute:'2-digit', second:'2-digit'
-    });
-  }catch{ return ts; }
+    const d = new Date(ts); // ts is UTC ISO with 'Z'
+    return new Intl.DateTimeFormat(undefined, {
+      year:'numeric',
+      month:'short',
+      day:'2-digit',
+      hour:'2-digit',
+      minute:'2-digit',
+      second:'2-digit',
+      timeZone: tz || 'UTC'
+    }).format(d);
+  }catch{
+    return ts;
+  }
 }
 
 export default function AdminPage(){
@@ -29,7 +36,12 @@ export default function AdminPage(){
       <div className="table-wrap">
         <table className="table">
           <thead>
-            <tr><th>User</th><th>Country</th><th>City</th><th>Time</th></tr>
+            <tr>
+              <th>User</th>
+              <th>Country</th>
+              <th>City</th>
+              <th>Time (Local)</th>
+            </tr>
           </thead>
           <tbody>
             {rows.map(r => (
@@ -37,7 +49,10 @@ export default function AdminPage(){
                 <td>{r.username}</td>
                 <td>{r.country}</td>
                 <td>{r.city}</td>
-                <td>{formatTime(r.time)}</td>
+                <td>
+                  {formatTime(r.time, r.timezone)} <br />
+                  <span className="sub">({r.timezone})</span>
+                </td>
               </tr>
             ))}
           </tbody>

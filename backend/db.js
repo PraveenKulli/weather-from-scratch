@@ -19,4 +19,11 @@ CREATE TABLE IF NOT EXISTS searches (
 );
 `);
 
+// Migration: add timezone column if missing
+try {
+  db.exec(`ALTER TABLE searches ADD COLUMN timezone TEXT DEFAULT 'UTC'`);
+} catch (_) {
+  // ignore error if column already exists
+}
+
 module.exports = db;

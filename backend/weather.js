@@ -1,3 +1,4 @@
+// backend/weather.js
 const fetch = require('node-fetch');
 const { z } = require('zod');
 const db = require('./db');
@@ -12,13 +13,19 @@ function buildUrl(city, country, apiKey) {
   return `https://api.openweathermap.org/data/2.5/weather?q=${q}&appid=${apiKey}&units=metric`;
 }
 
-function logSearch(userId, country, city) {
-  db.prepare('INSERT INTO searches(user_id, country, city) VALUES(?,?,?)').run(userId, country, city);
+// now logs timezone too
+function logSearch(userId, country, city, timezone = 'UTC') {
+  db.prepare('INSERT INTO searches(user_id, country, city, timezone) VALUES(?,?,?,?)')
+    .run(userId, country, city, timezone);
 }
 
 async function getWeatherWithPool(pool, req, res) {
   try {
-    const { city, country } = querySchema.parse({ city: req.query.city || '', country: req.query.country || '' });
+    const { city, country } = querySchema.parse({
+      city: req.query.city || '',
+      country: req.query.country || ''
+    });
+
     const key = pool.getAvailableKey();
     if (!key) return res.status(429).json({ error: 'Hourly OpenWeatherMap key limit exceeded' });
 
@@ -29,7 +36,10 @@ async function getWeatherWithPool(pool, req, res) {
     }
     const data = await r.json();
 
-    if (req.user?.id) logSearch(req.user.id, country, city);
+    // read user's timezone from header sent by the frontend (fallback UTC)
+    const tz = req.get('x-timezone') || 'UTC';
+
+    if (req.user?.id) logSearch(req.user.id, country, city, tz);
 
     const out = {
       city: data.name,
@@ -53,8 +63,9 @@ function getAllSearches(req, res) {
       u.username,
       s.country,
       s.city,
-      -- SQLite CURRENT_TIMESTAMP is UTC; format it as ISO-8601 UTC
-      strftime('%Y-%m-%dT%H:%M:%SZ', s.created_at) AS time
+      -- UTC ISO-8601 so the browser can convert correctly
+      strftime('%Y-%m-%dT%H:%M:%SZ', s.created_at) AS time,
+      s.timezone
     FROM searches s
     JOIN users u ON u.id = s.user_id
     ORDER BY s.created_at DESC
