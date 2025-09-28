@@ -29,7 +29,7 @@ export default function LoginPage(){
             className="input"
             value={username}
             onChange={e=>setUsername(e.target.value)}
-            placeholder="Username (e.g. alice)" autoComplete="username"
+            placeholder="Username (e.g. neha)" autoComplete="username"
           />
           <input
             type="password"
@@ -41,7 +41,7 @@ export default function LoginPage(){
           <button className="btn" type="submit">Sign In</button>
           {error && <div className="error">{error}</div>}
         </form>
-        <div className="sub">Tip: <b>alice / User@123</b> or <b>admin / Admin@123</b></div>
+        <div className="sub">Tip: <b>neha/ kulli@123</b> or <b>admin / Admin@123</b></div>
       </div>
 
       <aside className="card accent">
