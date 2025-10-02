@@ -15,15 +15,11 @@ CREATE TABLE IF NOT EXISTS searches (
   country TEXT NOT NULL,
   city TEXT NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  timezone TEXT DEFAULT 'UTC',
   FOREIGN KEY(user_id) REFERENCES users(id)
 );
 `);
 
-// Migration: add timezone column if missing
-try {
-  db.exec(`ALTER TABLE searches ADD COLUMN timezone TEXT DEFAULT 'UTC'`);
-} catch (_) {
-  // ignore error if column already exists
-}
+try { db.exec(`ALTER TABLE searches ADD COLUMN timezone TEXT DEFAULT 'UTC'`); } catch (_){}
 
 module.exports = db;

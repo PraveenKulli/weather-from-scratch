@@ -1,6 +1,6 @@
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
-const db = require('./db');
+const db = require('./src/infra/db');
 
 const upsert = db.prepare('INSERT OR IGNORE INTO users(username,password_hash,role) VALUES(?,?,?)');
 

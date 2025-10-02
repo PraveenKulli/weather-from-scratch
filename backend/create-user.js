@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const db = require('./db');
+const db = require('./src/infra/db');
 
 async function createUser(username, password, role = 'user') {
   const hash = await bcrypt.hash(password, 10);
