@@ -13,7 +13,7 @@ function Guard({ children, role }) {
   return children;
 }
 
-export default function App(){
+export default function App() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -21,18 +21,14 @@ export default function App(){
     <div className="container">
       {/* Header (brand + single global nav) */}
       <header className="header">
-        <div className="brand" onClick={()=>navigate('/')}>
+        <div className="brand" onClick={() => navigate('/')}>
           <span className="logo">🌤️</span>
           <span>Weather Report</span>
         </div>
         <nav className="nav">
           <Link to="/">Search</Link>
           <Link to="/admin">Admin</Link>
-          {user ? (
-            <button onClick={() => logout().then(()=>navigate('/login'))}>Logout</button>
-          ) : (
-            <Link to="/login">Login</Link>
-          )}
+          <button onClick={() => logout().then(() => navigate('/login'))}>Logout</button>
         </nav>
       </header>
 
